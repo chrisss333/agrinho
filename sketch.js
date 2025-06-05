@@ -13,7 +13,7 @@ function setup() {
   createCanvas(600, 400);
   player = new Player();
   // Criando alguns recursos no campo
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 10; i++) {
     resources.push(new Resource(random(width), random(height / 2)));
   }
 }
