@@ -7,7 +7,9 @@ let gameState = "intro"; // intro, playing, city
 function setup() {
   createCanvas(600, 400);
   player = new Player();
-  for (let i = 0; i < 10; i++) {
+
+  // Criar 20 bolinhas (recursos)
+  for (let i = 0; i < 20; i++) {
     resources.push(new Resource(random(width), random(height / 2)));
   }
 }
@@ -40,7 +42,7 @@ function showInstructions() {
 
   textSize(18);
   text("Use as setas do teclado para mover o personagem.", width / 2, 120);
-  text("Colete pelo menos 5 recursos coloridos no campo.", width / 2, 150);
+  text("Colete pelo menos 15 recursos coloridos no campo.", width / 2, 150);
   text("A cada coleta, você fica mais rápido!", width / 2, 180);
   text("Depois disso, você será levado à cidade.", width / 2, 210);
 
@@ -67,7 +69,8 @@ function playGame() {
     }
   }
 
-  if (collected >= 5 && !inCity) {
+  // Atualizado para 15 bolinhas necessárias
+  if (collected >= 15 && !inCity) {
     transitionToCity();
   }
 
@@ -109,6 +112,9 @@ class Player {
     if (keyIsDown(RIGHT_ARROW)) this.x += this.speed;
     if (keyIsDown(UP_ARROW)) this.y -= this.speed;
     if (keyIsDown(DOWN_ARROW)) this.y += this.speed;
+
+    this.x = constrain(this.x, 0, width);
+    this.y = constrain(this.y, 0, height);
   }
 
   display() {
@@ -128,7 +134,7 @@ class Resource {
     this.x = x;
     this.y = y;
     this.size = 20;
-    // Atribuindo uma cor aleatória a cada recurso
+    // Cor aleatória
     this.r = random(255);
     this.g = random(255);
     this.b = random(255);
