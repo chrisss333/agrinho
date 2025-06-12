@@ -1,22 +1,14 @@
 let player;
 let resources = [];
-let obstacles = [];
 let collected = 0;
 let inCity = false;
-let gameState = "intro";
+let gameState = "intro"; // intro, playing, city
 
 function setup() {
   createCanvas(600, 400);
   player = new Player();
-
-  // Criar recursos
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 10; i++) {
     resources.push(new Resource(random(width), random(height / 2)));
-  }
-
-  // Criar obstáculos
-  for (let i = 0; i < 5; i++) {
-    obstacles.push(new Obstacle(random(width), random(height - 100, height - 30)));
   }
 }
 
@@ -48,40 +40,34 @@ function showInstructions() {
 
   textSize(18);
   text("Use as setas do teclado para mover o personagem.", width / 2, 120);
-  text("Colete 15 recursos coloridos no campo.", width / 2, 150);
+  text("Colete pelo menos 5 recursos coloridos no campo.", width / 2, 150);
   text("A cada coleta, você fica mais rápido!", width / 2, 180);
-  text("Desvie dos obstáculos vermelhos!", width / 2, 210);
-  text("Se bater, volta ao início e perde velocidade.", width / 2, 240);
+  text("Depois disso, você será levado à cidade.", width / 2, 210);
 
   textSize(20);
   text("Pressione ENTER para começar", width / 2, 300);
 }
 
 function playGame() {
-  if (!inCity) displayField();
+  if (!inCity) {
+    displayField();
+  }
 
   player.update();
   player.display();
 
-  // Exibir obstáculos
-  for (let obs of obstacles) {
-    obs.display();
-    if (player.hitsObstacle(obs)) {
-      player.reset();
+  if (!inCity) {
+    for (let i = resources.length - 1; i >= 0; i--) {
+      resources[i].display();
+      if (player.collects(resources[i])) {
+        resources.splice(i, 1);
+        collected++;
+        player.speed += 0.5; // Aumenta a velocidade a cada coleta
+      }
     }
   }
 
-  // Exibir e coletar recursos
-  for (let i = resources.length - 1; i >= 0; i--) {
-    resources[i].display();
-    if (player.collects(resources[i])) {
-      resources.splice(i, 1);
-      collected++;
-      player.speed += 0.3;
-    }
-  }
-
-  if (collected >= 15 && !inCity) {
+  if (collected >= 5 && !inCity) {
     transitionToCity();
   }
 
@@ -112,10 +98,8 @@ function transitionToCity() {
 
 class Player {
   constructor() {
-    this.startX = width / 2;
-    this.startY = height - 30;
-    this.x = this.startX;
-    this.y = this.startY;
+    this.x = width / 2;
+    this.y = height - 30;
     this.size = 30;
     this.speed = 5;
   }
@@ -125,8 +109,6 @@ class Player {
     if (keyIsDown(RIGHT_ARROW)) this.x += this.speed;
     if (keyIsDown(UP_ARROW)) this.y -= this.speed;
     if (keyIsDown(DOWN_ARROW)) this.y += this.speed;
-    this.x = constrain(this.x, 0, width);
-    this.y = constrain(this.y, 0, height);
   }
 
   display() {
@@ -139,17 +121,6 @@ class Player {
     let d = dist(this.x, this.y, resource.x, resource.y);
     return d < this.size / 2 + resource.size / 2;
   }
-
-  hitsObstacle(obs) {
-    let d = dist(this.x, this.y, obs.x, obs.y);
-    return d < this.size / 2 + obs.size / 2;
-  }
-
-  reset() {
-    this.x = this.startX;
-    this.y = this.startY;
-    this.speed = max(5, this.speed - 1); // Não deixa ficar menor que 5
-  }
 }
 
 class Resource {
@@ -157,6 +128,7 @@ class Resource {
     this.x = x;
     this.y = y;
     this.size = 20;
+    // Atribuindo uma cor aleatória a cada recurso
     this.r = random(255);
     this.g = random(255);
     this.b = random(255);
@@ -168,25 +140,3 @@ class Resource {
     ellipse(this.x, this.y, this.size);
   }
 }
-
-class Obstacle {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.size = 40;
-  }
-
-  display() {
-    fill(180, 0, 0);
-    noStroke();
-    rectMode(CENTER);
-    rect(this.x, this.y, this.size, this.size);
-  }
-}
-
-
-   
-  
-
-   
-
