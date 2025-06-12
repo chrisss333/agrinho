@@ -7,7 +7,6 @@ let gameState = "intro"; // intro, playing, city
 function setup() {
   createCanvas(600, 400);
   player = new Player();
-  // Criando alguns recursos no campo
   for (let i = 0; i < 10; i++) {
     resources.push(new Resource(random(width), random(height / 2)));
   }
@@ -41,9 +40,9 @@ function showInstructions() {
 
   textSize(18);
   text("Use as setas do teclado para mover o personagem.", width / 2, 120);
-  text("Colete pelo menos 5 recursos verdes no campo.", width / 2, 150);
-  text("Depois disso, você será levado à cidade.", width / 2, 180);
-  text("Na cidade, você verá uma mensagem de boas-vindas.", width / 2, 210);
+  text("Colete pelo menos 5 recursos coloridos no campo.", width / 2, 150);
+  text("A cada coleta, você fica mais rápido!", width / 2, 180);
+  text("Depois disso, você será levado à cidade.", width / 2, 210);
 
   textSize(20);
   text("Pressione ENTER para começar", width / 2, 300);
@@ -63,6 +62,7 @@ function playGame() {
       if (player.collects(resources[i])) {
         resources.splice(i, 1);
         collected++;
+        player.speed += 0.5; // Aumenta a velocidade a cada coleta
       }
     }
   }
@@ -96,8 +96,6 @@ function transitionToCity() {
   resources = [];
 }
 
-// Classes mantidas
-
 class Player {
   constructor() {
     this.x = width / 2;
@@ -130,14 +128,20 @@ class Resource {
     this.x = x;
     this.y = y;
     this.size = 20;
+    // Atribuindo uma cor aleatória a cada recurso
+    this.r = random(255);
+    this.g = random(255);
+    this.b = random(255);
   }
 
   display() {
-    fill(0, 255, 0);
+    fill(this.r, this.g, this.b);
     noStroke();
     ellipse(this.x, this.y, this.size);
   }
 }
 
-       
+
+
+   
 
