@@ -1,13 +1,8 @@
-function setup() {
-  createCanvas(400, 400);
-}
-
-function draw() {
-  background(220);
-}let player;
+let player;
 let resources = [];
 let collected = 0;
 let inCity = false;
+let gameState = "intro"; // intro, playing, city
 
 function setup() {
   createCanvas(600, 400);
@@ -21,18 +16,47 @@ function setup() {
 function draw() {
   background(200);
 
-  if (!inCity) {
-    // Tela do campo
-    displayField();
-  } else {
-    // Tela da cidade
+  if (gameState === "intro") {
+    showInstructions();
+  } else if (gameState === "playing") {
+    playGame();
+  } else if (gameState === "city") {
     displayCity();
+    player.display();
+  }
+}
+
+function keyPressed() {
+  if (gameState === "intro" && keyCode === ENTER) {
+    gameState = "playing";
+  }
+}
+
+function showInstructions() {
+  background(50, 100, 200);
+  fill(255);
+  textAlign(CENTER);
+  textSize(28);
+  text("Como Jogar", width / 2, 60);
+
+  textSize(18);
+  text("Use as setas do teclado para mover o personagem.", width / 2, 120);
+  text("Colete pelo menos 5 recursos verdes no campo.", width / 2, 150);
+  text("Depois disso, você será levado à cidade.", width / 2, 180);
+  text("Na cidade, você verá uma mensagem de boas-vindas.", width / 2, 210);
+
+  textSize(20);
+  text("Pressione ENTER para começar", width / 2, 300);
+}
+
+function playGame() {
+  if (!inCity) {
+    displayField();
   }
 
   player.update();
   player.display();
 
-  // Mostrar recursos restantes no campo
   if (!inCity) {
     for (let i = resources.length - 1; i >= 0; i--) {
       resources[i].display();
@@ -43,12 +67,10 @@ function draw() {
     }
   }
 
-  // Verificar se o jogador coletou todos os recursos
   if (collected >= 5 && !inCity) {
     transitionToCity();
   }
 
-  // Mostrar número de recursos coletados
   textSize(20);
   fill(0);
   text("Recursos coletados: " + collected, 20, height - 20);
@@ -56,12 +78,12 @@ function draw() {
 
 function displayField() {
   fill(100, 200, 100);
-  rect(0, height / 2, width, height / 2); // Representando o campo com uma cor verde
+  rect(0, height / 2, width, height / 2);
 }
 
 function displayCity() {
   fill(150, 150, 255);
-  rect(0, height / 2, width, height / 2); // Representando a cidade com uma cor azul
+  rect(0, height / 2, width, height / 2);
   textSize(32);
   fill(255);
   text("Bem-vindo à cidade!", width / 4, height / 2 + 40);
@@ -69,9 +91,12 @@ function displayCity() {
 
 function transitionToCity() {
   inCity = true;
-  collected = 0; // Resetando a coleta para um novo começo
-  resources = []; // Limpa os recursos
+  gameState = "city";
+  collected = 0;
+  resources = [];
 }
+
+// Classes mantidas
 
 class Player {
   constructor() {
@@ -82,18 +107,10 @@ class Player {
   }
 
   update() {
-    if (keyIsDown(LEFT_ARROW)) {
-      this.x -= this.speed;
-    }
-    if (keyIsDown(RIGHT_ARROW)) {
-      this.x += this.speed;
-    }
-    if (keyIsDown(UP_ARROW)) {
-      this.y -= this.speed;
-    }
-    if (keyIsDown(DOWN_ARROW)) {
-      this.y += this.speed;
-    }
+    if (keyIsDown(LEFT_ARROW)) this.x -= this.speed;
+    if (keyIsDown(RIGHT_ARROW)) this.x += this.speed;
+    if (keyIsDown(UP_ARROW)) this.y -= this.speed;
+    if (keyIsDown(DOWN_ARROW)) this.y += this.speed;
   }
 
   display() {
@@ -104,10 +121,7 @@ class Player {
 
   collects(resource) {
     let d = dist(this.x, this.y, resource.x, resource.y);
-    if (d < this.size / 2 + resource.size / 2) {
-      return true;
-    }
-    return false;
+    return d < this.size / 2 + resource.size / 2;
   }
 }
 
@@ -124,4 +138,6 @@ class Resource {
     ellipse(this.x, this.y, this.size);
   }
 }
+
+       
 
